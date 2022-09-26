@@ -1,16 +1,19 @@
-const {network} = require('hardhat');
+const {network, ethers} = require('hardhat');
 const { networkConfig, developmentChains, VERIFICATION_BLOCK_CONFIRMATIONS } = require('../hardhat-helper-config');
- 
+const { verify } = require("../utils/verify")
+
+const FUND_AMOUNT = "1000000000000000000000"
+
 
 module.exports = async({getNamedAccounts, deployments})=>{
     const {deploy, log} = await deployments;
     const {deployer} = await getNamedAccounts();
-    let vrfCoordinatorV2, vrfCoordinatorV2Address,subscriptionId;
+    let vrfCoordinatorV2Mock, vrfCoordinatorV2Address,subscriptionId;
     const chainId = network.config.chainId;
     
     if(chainId == 31337){
-         vrfCoordinatorV2 = await getContract("VRFCoordinatorV2Mock");
-         vrfCoordinatorV2Address = vrfCoordinatorV2.address;
+        vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock");
+         vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address;
         const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
         const transactionReceipt = await transactionResponse.wait()
         subscriptionId = transactionReceipt.events[0].args.subId
@@ -33,7 +36,7 @@ module.exports = async({getNamedAccounts, deployments})=>{
         networkConfig[chainId]["gasLane"],
         networkConfig[chainId]["callbackGasLimit"],
     ]
-    const raffle = await deploy("Raffle", {
+    const send = await deploy("SendContract", {
         from: deployer,
         args: arguments,
         log: true,
@@ -43,13 +46,13 @@ module.exports = async({getNamedAccounts, deployments})=>{
     // Verify the deployment
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...")
-        await verify(raffle.address, arguments)
+        await verify(send.address, arguments)
     }
 
-    log("Enter lottery with command:")
-    const networkName = network.name == "hardhat" ? "localhost" : network.name
-    log(`yarn hardhat run scripts/enterRaffle.js --network ${networkName}`)
+    // log("Enter lottery with command:")
+    // const networkName = network.name == "hardhat" ? "localhost" : network.name
+    // log(`yarn hardhat run scripts/enterRaffle.js --network ${networkName}`)
     log("----------------------------------------------------")
 }
 
-module.exports.tags =["all", "mocks"]
+module.exports.tags =["all", "send"]

@@ -23,28 +23,28 @@ module.exports = {
     hardhat : {
       chainId : 31337,
     },
-    mainnet: {
-      url: MAINNET_RPC_URL,
-      accounts: PRIVATE_KEY ,
-      saveDeployments: true,
-      chainId: 1,
-    },
+    // mainnet: {
+    //   url: MAINNET_RPC_URL,
+    //   accounts: PRIVATE_KEY ,
+    //   saveDeployments: true,
+    //   chainId: 1,
+    // },
     goerli : {
       url : GOERLI_RPC_URL,
       chainId : 5,
-      accounts: PRIVATE_KEY,
+      accounts: [PRIVATE_KEY],
       saveDeployments : true,
     },
     polygon : {
       url : POLYGON_MAINNET_RPC_URL,
       chainId : 137,
-      accounts: PRIVATE_KEY,
+      accounts: [PRIVATE_KEY],
       saveDeployments : true,
     },
     polygontestnet : {
       url : POLYGON_TESTNET_RPC_URL,
       chainId : 80001,
-      accounts: PRIVATE_KEY,
+      accounts: [PRIVATE_KEY],
       saveDeployments : true,
     },
 
@@ -82,6 +82,15 @@ module.exports = {
               version: "0.4.24",
           },
       ],
+      solidity: {
+        version: "0.8.8",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
   },
   mocha: {
       timeout: 200000, // 200 seconds max for running tests
