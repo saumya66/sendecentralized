@@ -9,18 +9,28 @@ developmentChains.includes(network.name) ? describe.skip
   beforeEach(async() => {
         deployer = (await getNamedAccounts()).deployer
         console.log(deployer)
-        send = await ethers.getContract("Send", deployer)
+        send = await ethers.getContract("SendContract", deployer)
     })
     describe("Request", function () {
       it("Request", async () => {
-        let txResponse = await send.uploadedFile("QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t");
-        let txReceipt = await txResponse.wait(1);
-        let requestId = txReceipt.events[1].args.requestId;
-        let lastRandomNum = await send.getMapping();
-        console.log(requestId);
-        console.log(lastRandomNum);
-        assert(requestId.toNumber()>0)
-        assert.equal(0,0) 
+        console.log("1")
+        
+        await new Promise(async (resolve, reject) => {
+          console.log("3")
+          send.once("RequestSent", async()=> {
+            console.log("Entered");
+            let lastRandomNum = await send.getMapping();
+           
+            resolve()
+          })
+          console.log("2")
+          let txResponse = await send.uploadedFile("QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t",{gasLimit : 300000});
+          await txResponse.wait();
+          console.log(txResponse)
+          // assert(requestId.toNumber()>0)
+          assert.equal(0,0) 
+        })
       })
+      
     })
 });

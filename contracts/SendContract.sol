@@ -23,7 +23,8 @@ contract SendContract is VRFConsumerBaseV2 {
 
     address private owner;
     
-    event RequestedRandomCode(uint256 indexed requestId);
+    event RequestSent(uint256 requestId, uint32 numWords);
+    event RequestFulfilled(uint256 requestId, uint256[] randomWords);
 
     constructor(
         address vrfCoordinator, 
@@ -49,7 +50,7 @@ contract SendContract is VRFConsumerBaseV2 {
         return string(result);
     }
 
-    function uploadedFile(string calldata ipfsFileHash) public{
+    function uploadedFile(string calldata ipfsFileHash) external returns (uint256 requestId){
         fileHash = ipfsFileHash;
         uint requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
@@ -58,11 +59,12 @@ contract SendContract is VRFConsumerBaseV2 {
             i_callbackGasLimit,
             NUM_WORDS
         );
-        emit RequestedRandomCode(requestId);
+        emit RequestSent(requestId, NUM_WORDS);
+        return requestId;
     }
 
     function fulfillRandomWords(
-        uint256, /* requestId */
+        uint256  requestId,
         uint256[] memory randomWords 
     ) internal override { 
         uint256 randomNum = randomWords[0];
@@ -70,6 +72,8 @@ contract SendContract is VRFConsumerBaseV2 {
         string memory randomNumStr = substring(str,0,5);
         randNumToFileHashMap[randomNumStr] = fileHash;
         lastRandomNum  = randomNumStr;
+        emit RequestFulfilled(requestId, randomWords);
+
     }
 
     function getMapping() public view returns(string memory)

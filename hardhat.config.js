@@ -34,6 +34,9 @@ module.exports = {
       chainId : 5,
       accounts: [PRIVATE_KEY],
       saveDeployments : true,
+      // gas: 30e6,
+      // gasPrice: 10e6
+
     },
     polygon : {
       url : POLYGON_MAINNET_RPC_URL,
@@ -41,11 +44,11 @@ module.exports = {
       accounts: [PRIVATE_KEY],
       saveDeployments : true,
     },
-    polygontestnet : {
+    mumbai : {
       url : POLYGON_TESTNET_RPC_URL,
       chainId : 80001,
       accounts: [PRIVATE_KEY],
-      saveDeployments : true,
+      // saveDeployments : true,
     },
 
   },
@@ -54,6 +57,7 @@ module.exports = {
     apiKey: {
         goerli: ETHERSCAN_API_KEY,
         polygon: POLYGONSCAN_API_KEY,
+        polygonMumbai : POLYGONSCAN_API_KEY
     },
   },
   gasReporter: {
@@ -65,7 +69,7 @@ module.exports = {
   },
   contractSizer: {
       runOnCompile: false,
-      only: ["Send"],
+      only: ["SendContract"],
   },
   namedAccounts: {
       deployer: {
@@ -93,6 +97,6 @@ module.exports = {
       },
   },
   mocha: {
-      timeout: 200000, // 200 seconds max for running tests
+      timeout: 1000000, // 200 seconds max for running tests
   },
 };

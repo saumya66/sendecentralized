@@ -15,8 +15,9 @@ module.exports = async({getNamedAccounts, deployments})=>{
         vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock");
          vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address;
         const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
-        const transactionReceipt = await transactionResponse.wait()
+        const transactionReceipt = await transactionResponse.wait(1)
         subscriptionId = transactionReceipt.events[0].args.subId
+        console.log("subscriptionId", subscriptionId.toString())
         // Fund the subscription
         // Our mock makes it so we don't actually have to worry about sending fund
         await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT)
@@ -27,18 +28,19 @@ module.exports = async({getNamedAccounts, deployments})=>{
     }
     const waitBlockConfirmations = developmentChains.includes(network.name)
         ? 1
-        : VERIFICATION_BLOCK_CONFIRMATIONS
+        : 1
 
     log("----------------------------------------------------")
-    const arguments = [
+    const args = [
         vrfCoordinatorV2Address,
         subscriptionId,
         networkConfig[chainId]["gasLane"],
         networkConfig[chainId]["callbackGasLimit"],
     ]
+    log(deployer)
     const send = await deploy("SendContract", {
         from: deployer,
-        args: arguments,
+        args: args,
         log: true,
         waitConfirmations: waitBlockConfirmations,
     })
