@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -24,7 +24,7 @@ contract SendContract is VRFConsumerBaseV2 {
     address private owner;
     
     event RequestSent(uint256 requestId, uint32 numWords);
-    event RequestFulfilled(uint256 requestId, uint256[] randomWords);
+    event RequestFulfilled(uint256 requestId, string lastRandomNum);
 
     constructor(
         address vrfCoordinator, 
@@ -50,9 +50,9 @@ contract SendContract is VRFConsumerBaseV2 {
         return string(result);
     }
 
-    function uploadedFile(string calldata ipfsFileHash) external returns (uint256 requestId){
+    function uploadedFile(string calldata ipfsFileHash) public returns (uint256) {
         fileHash = ipfsFileHash;
-        uint requestId = i_vrfCoordinator.requestRandomWords(
+        uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
             REQUEST_CONFIRMATIONS,
@@ -64,7 +64,7 @@ contract SendContract is VRFConsumerBaseV2 {
     }
 
     function fulfillRandomWords(
-        uint256  requestId,
+        uint256 requestId,
         uint256[] memory randomWords 
     ) internal override { 
         uint256 randomNum = randomWords[0];
@@ -72,8 +72,7 @@ contract SendContract is VRFConsumerBaseV2 {
         string memory randomNumStr = substring(str,0,5);
         randNumToFileHashMap[randomNumStr] = fileHash;
         lastRandomNum  = randomNumStr;
-        emit RequestFulfilled(requestId, randomWords);
-
+        emit RequestFulfilled(requestId,lastRandomNum);
     }
 
     function getMapping() public view returns(string memory)

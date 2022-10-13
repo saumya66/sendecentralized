@@ -14,7 +14,6 @@ const { developmentChains } = require("../../hardhat-helper-config");
     describe("Request", function () {
       it("Request", async () => {
         console.log("1")
-        // await expect(send.uploadedFile('QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t')).to.emit(send, "RequestFulfilled")
         await new Promise(async (resolve, reject) => {
           console.log("3")
           send.once("RequestFulfilled", async()=> {
@@ -33,8 +32,6 @@ const { developmentChains } = require("../../hardhat-helper-config");
             requestId,
             send.address
           )
-          // assert(requestId.toNumber()>0)
-          // assert.equal(0,0) 
         })
       })
     })

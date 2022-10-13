@@ -33,7 +33,7 @@ module.exports = {
       url : GOERLI_RPC_URL,
       chainId : 5,
       accounts: [PRIVATE_KEY],
-      saveDeployments : true,
+      // saveDeployments : true,
       // gas: 30e6,
       // gasPrice: 10e6
 
@@ -42,7 +42,7 @@ module.exports = {
       url : POLYGON_MAINNET_RPC_URL,
       chainId : 137,
       accounts: [PRIVATE_KEY],
-      saveDeployments : true,
+      // saveDeployments : true,
     },
     mumbai : {
       url : POLYGON_TESTNET_RPC_URL,
@@ -88,12 +88,12 @@ module.exports = {
       ],
       solidity: {
         version: "0.8.8",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-        },
+        // settings: {
+        //   optimizer: {
+        //     enabled: true,
+        //     runs: 200,
+        //   },
+        // },
       },
   },
   mocha: {

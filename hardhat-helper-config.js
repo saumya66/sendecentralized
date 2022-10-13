@@ -22,9 +22,9 @@ const networkConfig = {
     80001:{
         name: "mumbai",
         subscriptionId: "1972",
-        gasLane: "0x6e099d640cde6de9d40ac749b4b594126b0169747122711109c9985d47751f93", // 200 gwei
-        callbackGasLimit: "500000", // 500,000 gas
-        vrfCoordinatorV2: "0xAE975071Be8F8eE67addBC1A82488F1C24858067",
+        gasLane: "0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f", // 200 gwei
+        callbackGasLimit: "2500000", // 500,000 gas
+        vrfCoordinatorV2: "0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed",
     }
 }
 
