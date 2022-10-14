@@ -8,12 +8,13 @@ const FUND_AMOUNT = "1000000000000000000000"
 module.exports = async({getNamedAccounts, deployments})=>{
     const {deploy, log} = await deployments;
     const {deployer} = await getNamedAccounts();
+    console.log("Deployer :",deployer)
     let vrfCoordinatorV2Mock, vrfCoordinatorV2Address,subscriptionId;
     const chainId = network.config.chainId;
     
     if(chainId == 31337){
         vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock");
-         vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address;
+        vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address;
         const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
         const transactionReceipt = await transactionResponse.wait(1)
         subscriptionId = transactionReceipt.events[0].args.subId

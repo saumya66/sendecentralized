@@ -7,6 +7,9 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 
+error FileRetrievedAlready();
+error AccessDenied();
+
 contract SendContract is VRFConsumerBaseV2 { 
     // Chainlink VRF Variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -18,13 +21,14 @@ contract SendContract is VRFConsumerBaseV2 {
 
     string private lastRandomNum;
     string private fileHash;
+    string private generatedrandomNum;
 
     mapping(string => string) private randNumToFileHashMap;
 
     address private owner;
     
-    event RequestSent(uint256 requestId, uint32 numWords);
-    event RequestFulfilled(uint256 requestId, string lastRandomNum);
+    event RequestSent(uint256 requestId);
+    event RequestFulfilled(uint256 requestId,string randomNum );
 
     constructor(
         address vrfCoordinator, 
@@ -50,7 +54,7 @@ contract SendContract is VRFConsumerBaseV2 {
         return string(result);
     }
 
-    function uploadedFile(string calldata ipfsFileHash) public returns (uint256) {
+    function uploadedFile(string memory ipfsFileHash) public returns (uint256) {
         fileHash = ipfsFileHash;
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
@@ -59,7 +63,7 @@ contract SendContract is VRFConsumerBaseV2 {
             i_callbackGasLimit,
             NUM_WORDS
         );
-        emit RequestSent(requestId, NUM_WORDS);
+        emit RequestSent(requestId);
         return requestId;
     }
 
@@ -71,13 +75,22 @@ contract SendContract is VRFConsumerBaseV2 {
         string memory str = Strings.toString(randomNum);
         string memory randomNumStr = substring(str,0,5);
         randNumToFileHashMap[randomNumStr] = fileHash;
-        lastRandomNum  = randomNumStr;
-        emit RequestFulfilled(requestId,lastRandomNum);
+        generatedrandomNum = randomNumStr;
+        emit RequestFulfilled(requestId,randomNumStr);
     }
 
-    function getMapping() public view returns(string memory)
-    {
-        return lastRandomNum;
+    function getFile(string calldata randNum) public returns(string memory){
+        if(keccak256(abi.encodePacked(randNumToFileHashMap[randNum]))==keccak256(abi.encodePacked(""))){
+            revert FileRetrievedAlready();
+        }
+        string memory ipfsFileHash = randNumToFileHashMap[randNum];
+        delete randNumToFileHashMap[randNum];
+        return ipfsFileHash;
     }
-
+    function getRandomNum() public view returns(string memory){
+        if(msg.sender != owner){
+            revert AccessDenied();
+        }
+        return generatedrandomNum;
+    }
 }

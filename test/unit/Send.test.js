@@ -5,29 +5,30 @@ const { developmentChains } = require("../../hardhat-helper-config");
 : describe("Send", function () {
     let accounts, vrfCoordinatorV2MockContract, sendContract, send;
     beforeEach(async() => {
+      deployer = (await getNamedAccounts()).deployer
+      console.log("Testing Account : ",deployer)
       accounts = await ethers.getSigners();
       await deployments.fixture("all");
       vrfCoordinatorV2MockContract = await ethers.getContract("VRFCoordinatorV2Mock");
       sendContract = await ethers.getContract("SendContract");
-      send = await sendContract.connect(accounts[0]);
+      send = await sendContract.connect(deployer);
     })
-    describe("Request", function () {
-      it("Request", async () => {
-        console.log("1")
+    describe("Uploading a file", function () {
+      it("Generates Random Code", async () => {
         await new Promise(async (resolve, reject) => {
-          console.log("3")
+          console.log("In the promise...")
           send.once("RequestFulfilled", async()=> {
-            console.log("Entered");
-            let lastRandomNum = await send.getMapping();
-            console.log(lastRandomNum.toString())
+            console.log("RequestFulfilled event fired...")
+            let generatedrandomNum = await send.getRandomNum();
+            console.log("Generated Random Code :", generatedrandomNum);
             resolve()
           })
           console.log("2")
-          let txResponse = await send.uploadedFile("QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t",{gasLimit : 300000});
-          console.log(txResponse.value.toString())
-          const txReceipt = await txResponse.wait();
+          let txResponse = await send.uploadedFile("QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t",{gasLimit : 2000000});
+          // console.log(txResponse.value.toString())
+          const txReceipt = await txResponse.wait(1);
           const requestId = txReceipt.events[1].args.requestId;
-          console.log(requestId)
+          console.log("Generated RequestId : ",requestId)
           await vrfCoordinatorV2MockContract.fulfillRandomWords(
             requestId,
             send.address
