@@ -20,6 +20,16 @@ developmentChains.includes(network.name) ? describe.skip
               console.log("RequestFulfilled event fired...");
               let generatedrandomNum = await send.getRandomNum();
               console.log("Generated Random Code :",generatedrandomNum);
+              assert.equal(generatedrandomNum.length, 6)
+              // let fileHash = await send.getFileHash();
+              let txResponse = await send.getFile(generatedrandomNum);
+              console.log("a");
+              let txReceipt = await txResponse.wait();
+              console.log("b");
+              let uploadedFileHash = txReceipt.events[0].args.fileHash;
+              console.log("c");
+              console.log("FileHash", uploadedFileHash)
+              assert.equal(uploadedFileHash , "QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t" )
               resolve()
             } catch (error) {
               console.log(error)

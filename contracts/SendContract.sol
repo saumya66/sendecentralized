@@ -5,7 +5,7 @@ pragma solidity ^0.8.9;
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-
+import "../node_modules/hardhat/console.sol";
 
 error FileRetrievedAlready();
 error AccessDenied();
@@ -28,7 +28,8 @@ contract SendContract is VRFConsumerBaseV2 {
     address private owner;
     
     event RequestSent(uint256 requestId);
-    event RequestFulfilled(uint256 requestId,string randomNum );
+    event FileRetrieved(string fileHash);
+    event RequestFulfilled(string randomNum );
 
     constructor(
         address vrfCoordinator, 
@@ -54,7 +55,7 @@ contract SendContract is VRFConsumerBaseV2 {
         return string(result);
     }
 
-    function uploadedFile(string memory ipfsFileHash) public returns (uint256) {
+    function uploadedFile(string memory ipfsFileHash) public{
         fileHash = ipfsFileHash;
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
@@ -64,11 +65,10 @@ contract SendContract is VRFConsumerBaseV2 {
             NUM_WORDS
         );
         emit RequestSent(requestId);
-        return requestId;
     }
 
     function fulfillRandomWords(
-        uint256 requestId,
+        uint256,/*requestId*/ 
         uint256[] memory randomWords 
     ) internal override { 
         uint256 randomNum = randomWords[0];
@@ -76,7 +76,7 @@ contract SendContract is VRFConsumerBaseV2 {
         string memory randomNumStr = substring(str,0,5);
         randNumToFileHashMap[randomNumStr] = fileHash;
         generatedrandomNum = randomNumStr;
-        emit RequestFulfilled(requestId,randomNumStr);
+        emit RequestFulfilled(randomNumStr);
     }
 
     function getFile(string calldata randNum) public returns(string memory){
@@ -85,12 +85,19 @@ contract SendContract is VRFConsumerBaseV2 {
         }
         string memory ipfsFileHash = randNumToFileHashMap[randNum];
         delete randNumToFileHashMap[randNum];
-        return ipfsFileHash;
+        emit FileRetrieved(ipfsFileHash);
     }
     function getRandomNum() public view returns(string memory){
         if(msg.sender != owner){
             revert AccessDenied();
         }
+        console.log(generatedrandomNum);
         return generatedrandomNum;
+    }
+    function getFileHash(string memory randNum) public view returns(string memory){
+        if(msg.sender != owner){
+            revert AccessDenied();
+        }
+        return randNumToFileHashMap[randNum];
     }
 }

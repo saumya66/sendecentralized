@@ -26,7 +26,8 @@ const { developmentChains } = require("../../hardhat-helper-config");
           console.log("2")
           let txResponse = await send.uploadedFile("QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t",{gasLimit : 2000000});
           // console.log(txResponse.value.toString())
-          const txReceipt = await txResponse.wait(1);
+          console.log("let's wait...")
+          const txReceipt = await txResponse.wait();
           const requestId = txReceipt.events[1].args.requestId;
           console.log("Generated RequestId : ",requestId)
           await vrfCoordinatorV2MockContract.fulfillRandomWords(
