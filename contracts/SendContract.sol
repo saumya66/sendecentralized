@@ -5,8 +5,7 @@ pragma solidity ^0.8.9;
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "../node_modules/hardhat/console.sol";
-
+ 
 error FileRetrievedAlready();
 error AccessDenied();
 
@@ -55,7 +54,7 @@ contract SendContract is VRFConsumerBaseV2 {
         return string(result);
     }
 
-    function uploadedFile(string memory ipfsFileHash) public{
+    function uploadedFile(string calldata ipfsFileHash) public{
         fileHash = ipfsFileHash;
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
@@ -79,24 +78,23 @@ contract SendContract is VRFConsumerBaseV2 {
         emit RequestFulfilled(randomNumStr);
     }
 
-    function getFile(string calldata randNum) public returns(string memory){
+    function getFile(string calldata randNum) public{
         if(keccak256(abi.encodePacked(randNumToFileHashMap[randNum]))==keccak256(abi.encodePacked(""))){
-            revert FileRetrievedAlready();
+            revert ("File Retrieved Already");
         }
         string memory ipfsFileHash = randNumToFileHashMap[randNum];
         delete randNumToFileHashMap[randNum];
         emit FileRetrieved(ipfsFileHash);
     }
     function getRandomNum() public view returns(string memory){
-        if(msg.sender != owner){
-            revert AccessDenied();
-        }
-        console.log(generatedrandomNum);
         return generatedrandomNum;
     }
     function getFileHash(string memory randNum) public view returns(string memory){
         if(msg.sender != owner){
             revert AccessDenied();
+        }
+        if(keccak256(abi.encodePacked(randNumToFileHashMap[randNum]))==keccak256(abi.encodePacked(""))){
+            revert ("File Retrieved Already");
         }
         return randNumToFileHashMap[randNum];
     }

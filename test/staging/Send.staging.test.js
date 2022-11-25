@@ -15,10 +15,13 @@ developmentChains.includes(network.name) ? describe.skip
       it("Generates Random Code", async () => {
         await new Promise(async (resolve, reject) => {
           console.log("In the promise...")
+          let txUploadReceipt
           send.once("RequestFulfilled", async()=> {
             try{
               console.log("RequestFulfilled event fired...");
+              // console.log(txUploadReceipt.events[1].args)
               let generatedrandomNum = await send.getRandomNum();
+              // let generatedrandomNum = txUploadReceipt.events[0].args.randomNum;
               console.log("Generated Random Code :",generatedrandomNum);
               assert.equal(generatedrandomNum.length, 6)
               // let fileHash = await send.getFileHash();
@@ -37,9 +40,9 @@ developmentChains.includes(network.name) ? describe.skip
             }
           })
           console.log("2")
-          let txResponse = await send.uploadedFile("QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t", {gasLimit:2000000});
+          let txUploadResponse = await send.uploadedFile("QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t", {gasLimit:2000000});
           console.log("let's wait...")
-          await txResponse.wait(1);
+          // txUploadReceipt = await txUploadResponse.wait(0);
           console.log("let's wait more...")
         })
       })

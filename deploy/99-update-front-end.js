@@ -3,8 +3,8 @@ const fs = require('fs')
 module.exports = async function(){
     if(process.env.UPDATE_FRONTEND){
         console.log("Updating front end...");
-        updateContractAddresses();
-        updateContractAbi();
+        await updateContractAddresses();
+        await updateContractAbi();
     }
 }
 
@@ -13,8 +13,8 @@ const FRONT_END_ABI_FILE = "../send-f/constants/abi.json"
 
 async function updateContractAbi(){
     const sendContract = await ethers.getContract("SendContract");
+    console.log("sendContract.interface.format(ethers.utils.FormatTypes.json)")
     fs.writeFileSync(FRONT_END_ABI_FILE, sendContract.interface.format(ethers.utils.FormatTypes.json));
-    
 }
 
 async function updateContractAddresses(){
@@ -24,9 +24,10 @@ async function updateContractAddresses(){
 
     if(contractAddress[chainId])
     {
-        if(!contractAddress[chainId].includes(sendContract.address)){
-            contractAddress[chainId].push(sendContract.address);
-        }
+        // if(!contractAddress[chainId].includes(sendContract.address)){
+        //     contractAddress[chainId].push(sendContract.address);
+        // }
+        contractAddress[chainId] = sendContract.address;
     }
     else {
         contractAddress[chainId] = sendContract.address;
